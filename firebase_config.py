@@ -1,16 +1,20 @@
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Get the folder where this file is located
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if not firebase_admin._apps:
+    firebase_key = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
 
-# Full path to the service account key
-SERVICE_ACCOUNT_PATH = os.path.join(BASE_DIR, "serviceAccountKey.json")
+    if firebase_key:
+        try:
+            service_account = json.loads(firebase_key)
+            cred = credentials.Certificate(service_account)
+        except Exception:
+            cred = credentials.Certificate("serviceAccountKey.json")
+    else:
+        cred = credentials.Certificate("serviceAccountKey.json")
 
-# Initialize Firebase
-cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
-firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(cred)
 
-# Firestore database
 db = firestore.client()
