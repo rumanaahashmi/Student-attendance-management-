@@ -1,13 +1,16 @@
 import sys
+import os
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from app import app
+try:
+    from app import app
+except Exception as e:
+    print(f"Error importing app: {e}")
+    raise
 
-# Export the Flask app as the handler for Vercel
-__all__ = ['app']
-
+# Ensure Flask app is the WSGI application for Vercel
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=False)
 
