@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Students</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Student List</h2>
+        <div class="card">
+            <div class="button-row">
+                <a href="/add_student" class="btn-link">Add Student</a>
+                <a href="/" class="btn-link">Back to Home</a>
+            </div>
+            <table>
+                <tr>
+                    <th>Roll Number</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.roll }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.class }}</td>
+                    <td class="actions">
+                        <a href="/edit_student/{{ student.id }}">Edit</a>
+                        |
+                        <a href="/delete_student/{{ student.id }}" onclick="return confirm('Delete this student?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>

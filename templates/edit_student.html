@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Student</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Student</h1>
+        <div class="card">
+            <form method="POST">
+                <div class="form-group">
+                    <label>Roll Number</label>
+                    <input type="text" name="roll" value="{{ student.roll }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" value="{{ student.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Course</label>
+                    <input type="text" name="course" value="{{ student.course }}" required>
+                </div>
+                <div class="button-row">
+                    <button type="submit">Update Student</button>
+                    <a href="/view_students" class="btn-link">Back to Student List</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
