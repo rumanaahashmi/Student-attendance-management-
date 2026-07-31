@@ -1,16 +1,12 @@
 import sys
-import os
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+# Add root project directory to Python module search path
+root_dir = str(Path(__file__).resolve().parent.parent)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
-try:
-    from app import app
-except Exception as e:
-    print(f"Error importing app: {e}")
-    raise
+from app import app
 
-# Ensure Flask app is the WSGI application for Vercel
-if __name__ == "__main__":
-    app.run(debug=False)
-
+# Explicit top-level WSGI application exports for Vercel
+application = app

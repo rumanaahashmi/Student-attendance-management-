@@ -1,10 +1,15 @@
 import os
 import json
+import tempfile
 import uuid
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-LOCAL_DB_FILE = os.path.join(os.path.dirname(__file__), ".local_db.json")
+# Use /tmp for serverless environments like Vercel
+if os.environ.get("VERCEL") or not os.access(os.path.dirname(__file__), os.W_OK):
+    LOCAL_DB_FILE = os.path.join(tempfile.gettempdir(), ".local_db.json")
+else:
+    LOCAL_DB_FILE = os.path.join(os.path.dirname(__file__), ".local_db.json")
 
 
 class LocalDocumentSnapshot:
