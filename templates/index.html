@@ -1,19 +1,91 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Attendance Management System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% extends "base.html" %}
 
-<body>
-    <div class="container">
-        <h1>Attendance Management System</h1>
-        <div class="card">
-            <div class="button-row">
-                <a href="/view_students" class="btn-link">View Students</a>
-                <a href="/add_student" class="btn-link">Add Student</a>
-            </div>
+{% block title %}Dashboard - Student Attendance Management{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Dashboard</h1>
+        <p class="subtitle">Overview of student attendance metrics for today ({{ today_date }})</p>
+    </div>
+    <div class="quick-actions">
+        <a href="{{ url_for('attendance') }}" class="btn btn-primary"><i class="fa-solid fa-clipboard-check"></i> Take Attendance</a>
+        <a href="{{ url_for('add_student') }}" class="btn btn-secondary"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon icon-blue">
+            <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <div class="stat-details">
+            <span class="stat-value">{{ total_students }}</span>
+            <span class="stat-label">Total Enrolled Students</span>
         </div>
     </div>
-</body>
-</html>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-purple">
+            <i class="fa-solid fa-clipboard-list"></i>
+        </div>
+        <div class="stat-details">
+            <span class="stat-value">{{ today_marked }}</span>
+            <span class="stat-label">Records Marked Today</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-green">
+            <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="stat-details">
+            <span class="stat-value">{{ today_rate }}%</span>
+            <span class="stat-label">Today's Attendance Rate</span>
+        </div>
+    </div>
+</div>
+
+<div class="card main-card">
+    <div class="card-header">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h2>
+        <a href="{{ url_for('attendance_history') }}" class="link-btn">View All Reports &rarr;</a>
+    </div>
+
+    {% if recent_records %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Roll No</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in recent_records %}
+                <tr>
+                    <td>{{ record.date }}</td>
+                    <td><span class="badge-roll">{{ record.roll }}</span></td>
+                    <td><strong>{{ record.student_name }}</strong></td>
+                    <td>{{ record.course }}</td>
+                    <td>
+                        <span class="badge-status status-{{ record.status | lower }}">
+                            {{ record.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fa-solid fa-folder-open empty-icon"></i>
+        <p>No attendance records found yet. Click <strong>Take Attendance</strong> to record student presence.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

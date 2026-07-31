@@ -1,39 +1,75 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>View Students</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h2>Student List</h2>
-        <div class="card">
-            <div class="button-row">
-                <a href="/add_student" class="btn-link">Add Student</a>
-                <a href="/" class="btn-link">Back to Home</a>
-            </div>
-            <table>
-                <tr>
-                    <th>Roll Number</th>
-                    <th>Name</th>
-                    <th>Class</th>
-                    <th>Actions</th>
-                </tr>
+{% extends "base.html" %}
 
+{% block title %}View Students - Attendance System{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Student Roster</h1>
+        <p class="subtitle">Manage enrolled students and courses</p>
+    </div>
+    <div class="quick-actions">
+        <a href="{{ url_for('add_student') }}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+    </div>
+</div>
+
+<div class="card main-card">
+    <form method="GET" action="{{ url_for('view_students') }}" class="filter-bar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="studentSearchInput" name="q" value="{{ query_str }}" placeholder="Search by student name or roll number..." autocomplete="off">
+        </div>
+
+        <div class="select-box">
+            <i class="fa-solid fa-filter filter-icon"></i>
+            <select name="course" onchange="this.form.submit()">
+                <option value="">All Courses</option>
+                {% for course in courses %}
+                    <option value="{{ course }}" {% if selected_course == course %}selected{% endif %}>{{ course }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if query_str or selected_course %}
+            <a href="{{ url_for('view_students') }}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-xmark"></i> Clear Filters</a>
+        {% endif %}
+    </form>
+
+    <div class="table-responsive">
+        <table id="studentsTable">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Course / Class</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for student in students %}
                 <tr>
-                    <td>{{ student.roll }}</td>
-                    <td>{{ student.name }}</td>
-                    <td>{{ student.class }}</td>
-                    <td class="actions">
-                        <a href="/edit_student/{{ student.id }}">Edit</a>
-                        |
-                        <a href="/delete_student/{{ student.id }}" onclick="return confirm('Delete this student?')">Delete</a>
+                    <td><span class="badge-roll">{{ student.roll }}</span></td>
+                    <td><strong>{{ student.name }}</strong></td>
+                    <td><span class="badge-course">{{ student.course }}</span></td>
+                    <td class="text-right actions">
+                        <a href="{{ url_for('edit_student', student_id=student.id) }}" class="btn-action edit" title="Edit Student">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </a>
+                        <a href="{{ url_for('delete_student', student_id=student.id) }}" class="btn-action delete" onclick="return confirm('Are you sure you want to delete student {{ student.name }} (Roll: {{ student.roll }})?')" title="Delete Student">
+                            <i class="fa-solid fa-trash-can"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center empty-cell">
+                        <i class="fa-solid fa-user-slash empty-icon"></i>
+                        <p>No students found matching your criteria.</p>
                     </td>
                 </tr>
                 {% endfor %}
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

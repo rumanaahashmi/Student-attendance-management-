@@ -1,33 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Student</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% extends "base.html" %}
 
-<body>
-    <div class="container">
-        <h1>Add Student</h1>
-        <div class="card">
-            <form method="POST">
-                <div class="form-group">
-                    <label>Roll Number</label>
-                    <input type="text" name="roll" required>
-                </div>
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label>Course</label>
-                    <input type="text" name="course" required>
-                </div>
-                <div class="button-row">
-                    <button type="submit">Add Student</button>
-                    <a href="/" class="btn-link">Back to Home</a>
-                </div>
-            </form>
+{% block title %}Add New Student - Attendance System{% endblock %}
+
+{% block content %}
+<div class="form-page-container">
+    <div class="card form-card">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-user-plus"></i> Add New Student</h2>
+            <a href="{{ url_for('view_students') }}" class="btn-link"><i class="fa-solid fa-arrow-left"></i> Back to Student List</a>
         </div>
+
+        <form method="POST" action="{{ url_for('add_student') }}">
+            <div class="form-group">
+                <label for="roll"><i class="fa-solid fa-id-card"></i> Roll Number / Student ID</label>
+                <input type="text" id="roll" name="roll" placeholder="e.g. 104" required>
+            </div>
+
+            <div class="form-group">
+                <label for="name"><i class="fa-solid fa-user"></i> Full Name</label>
+                <input type="text" id="name" name="name" placeholder="e.g. Rahul Sharma" required>
+            </div>
+
+            <div class="form-group">
+                <label for="course"><i class="fa-solid fa-book-open"></i> Course / Class</label>
+                <input type="text" id="course" name="course" placeholder="e.g. Computer Science" required>
+            </div>
+
+            <div class="button-row form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Add Student</button>
+                <a href="{{ url_for('view_students') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

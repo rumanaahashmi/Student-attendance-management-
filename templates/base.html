@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Attendance Management{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-background"></div>
+    
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{ url_for('index') }}">
+                <i class="fa-solid fa-graduation-cap brand-icon"></i>
+                <span>AttendTrack</span>
+            </a>
+        </div>
+        
+        <ul class="nav-links">
+            <li>
+                <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('view_students') }}" class="{% if request.endpoint == 'view_students' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i> Students
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('attendance') }}" class="{% if request.endpoint == 'attendance' %}active{% endif %}">
+                    <i class="fa-solid fa-clipboard-user"></i> Mark Attendance
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('attendance_history') }}" class="{% if request.endpoint == 'attendance_history' %}active{% endif %}">
+                    <i class="fa-solid fa-clock-rotate-left"></i> History & Reports
+                </a>
+            </li>
+        </ul>
+
+        <div class="nav-user">
+            {% if session.get('user') %}
+                <span class="user-badge"><i class="fa-solid fa-circle-user"></i> {{ session.get('user') }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages-container">
+                    {% for category, message in messages %}
+                        <div class="flash-alert flash-{{ category }}">
+                            <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-xmark{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                            <span>{{ message }}</span>
+                            <button type="button" class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; 2026 Student Attendance Management System. Crafted with precision.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

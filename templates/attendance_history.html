@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance History & Reports - Attendance System{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Attendance History & Reports</h1>
+        <p class="subtitle">Review attendance logs and per-student performance metrics</p>
+    </div>
+    <div class="quick-actions">
+        <a href="{{ url_for('attendance') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Take New Attendance</a>
+    </div>
+</div>
+
+<div class="card main-card">
+    <div class="tabs-header">
+        <button type="button" class="tab-btn active" onclick="switchTab('studentStatsTab')"><i class="fa-solid fa-chart-column"></i> Student Performance Summary</button>
+        <button type="button" class="tab-btn" onclick="switchTab('dailyLogsTab')"><i class="fa-solid fa-list-check"></i> Daily Attendance Logs</button>
+    </div>
+
+    <!-- Student Performance Summary Tab -->
+    <div id="studentStatsTab" class="tab-content active">
+        {% if student_stats %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th>Total Classes</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Late</th>
+                        <th>Attendance Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in student_stats %}
+                    <tr>
+                        <td><span class="badge-roll">{{ stat.roll }}</span></td>
+                        <td><strong>{{ stat.name }}</strong></td>
+                        <td><span class="badge-course">{{ stat.course }}</span></td>
+                        <td>{{ stat.total }}</td>
+                        <td><span class="text-green font-bold">{{ stat.present }}</span></td>
+                        <td><span class="text-red font-bold">{{ stat.absent }}</span></td>
+                        <td><span class="text-orange font-bold">{{ stat.late }}</span></td>
+                        <td>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar {% if stat.rate >= 75 %}bg-green{% elif stat.rate >= 50 %}bg-orange{% else %}bg-red{% endif %}" style="width: {{ stat.rate }}%;"></div>
+                                <span class="progress-text">{{ stat.rate }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-chart-pie empty-icon"></i>
+            <p>No statistics available. Take attendance to start generating performance metrics.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Daily Attendance Logs Tab -->
+    <div id="dailyLogsTab" class="tab-content">
+        <form method="GET" action="{{ url_for('attendance_history') }}" class="filter-bar">
+            <div class="form-group-inline">
+                <label><i class="fa-solid fa-calendar"></i> Filter Date:</label>
+                <select name="date" onchange="this.form.submit()">
+                    <option value="">All Dates</option>
+                    {% for d in dates %}
+                        <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group-inline">
+                <label><i class="fa-solid fa-book"></i> Filter Course:</label>
+                <select name="course" onchange="this.form.submit()">
+                    <option value="">All Courses</option>
+                    {% for c in courses %}
+                        <option value="{{ c }}" {% if selected_course == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if selected_date or selected_course %}
+                <a href="{{ url_for('attendance_history') }}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-xmark"></i> Clear Filters</a>
+            {% endif %}
+        </form>
+
+        {% if records %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td>{{ r.date }}</td>
+                        <td><span class="badge-roll">{{ r.roll }}</span></td>
+                        <td><strong>{{ r.student_name }}</strong></td>
+                        <td>{{ r.course }}</td>
+                        <td>
+                            <span class="badge-status status-{{ r.status | lower }}">
+                                {{ r.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-receipt empty-icon"></i>
+            <p>No log entries found for the selected filter.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+</script>
+{% endblock %}

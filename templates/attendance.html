@@ -1,36 +1,92 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Attendance</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}Mark Attendance - Attendance System{% endblock %}
 
-<h1>Attendance Page</h1>
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Mark Attendance</h1>
+        <p class="subtitle">Record student attendance status for specific dates and classes</p>
+    </div>
+    <div class="quick-actions">
+        <button type="button" id="markAllPresentBtn" class="btn btn-success"><i class="fa-solid fa-check-double"></i> Mark All Present</button>
+    </div>
+</div>
 
-<table border="1">
+<div class="card main-card">
+    <form method="GET" action="{{ url_for('attendance') }}" class="filter-bar">
+        <div class="form-group-inline">
+            <label for="attDate"><i class="fa-solid fa-calendar-days"></i> Select Date:</label>
+            <input type="date" id="attDate" name="date" value="{{ att_date }}" onchange="this.form.submit()">
+        </div>
 
-<tr>
-<th>Roll No</th>
-<th>Name</th>
-<th>Status</th>
-</tr>
+        <div class="form-group-inline">
+            <label for="attCourse"><i class="fa-solid fa-book-open"></i> Course Filter:</label>
+            <select id="attCourse" name="course" onchange="this.form.submit()">
+                <option value="">All Courses</option>
+                {% for course in courses %}
+                    <option value="{{ course }}" {% if selected_course == course %}selected{% endif %}>{{ course }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
 
-<tr>
-<td>101</td>
-<td>Ali</td>
+    {% if students %}
+    <form method="POST" action="{{ url_for('attendance') }}">
+        <input type="hidden" name="date" value="{{ att_date }}">
+        <input type="hidden" name="course" value="{{ selected_course }}">
 
-<td>
-<select>
-<option>Present</option>
-<option>Absent</option>
-</select>
-</td>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th class="text-center">Attendance Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    {% set current_status = attendance_records.get(student.id, 'Present') %}
+                    <tr>
+                        <td><span class="badge-roll">{{ student.roll }}</span></td>
+                        <td><strong>{{ student.name }}</strong></td>
+                        <td><span class="badge-course">{{ student.course }}</span></td>
+                        <td>
+                            <div class="status-selector-group">
+                                <label class="status-option status-option-present {% if current_status == 'Present' %}selected{% endif %}">
+                                    <input type="radio" name="status_{{ student.id }}" value="Present" {% if current_status == 'Present' %}checked{% endif %}>
+                                    <i class="fa-solid fa-circle-check"></i> Present
+                                </label>
+                                <label class="status-option status-option-absent {% if current_status == 'Absent' %}selected{% endif %}">
+                                    <input type="radio" name="status_{{ student.id }}" value="Absent" {% if current_status == 'Absent' %}checked{% endif %}>
+                                    <i class="fa-solid fa-circle-xmark"></i> Absent
+                                </label>
+                                <label class="status-option status-option-late {% if current_status == 'Late' %}selected{% endif %}">
+                                    <input type="radio" name="status_{{ student.id }}" value="Late" {% if current_status == 'Late' %}checked{% endif %}>
+                                    <i class="fa-solid fa-clock"></i> Late
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-</tr>
-
-</table>
-
-</body>
-</html>
+        <div class="form-actions text-right" style="margin-top: 24px;">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-floppy-disk"></i> Save Attendance for {{ att_date }}
+            </button>
+        </div>
+    </form>
+    {% else %}
+    <div class="empty-state">
+        <i class="fa-solid fa-users-slash empty-icon"></i>
+        <p>No enrolled students found for the selected course filter.</p>
+        <a href="{{ url_for('add_student') }}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Add New Student</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
